@@ -119,7 +119,6 @@ Prebuilt packages are published as GitHub Releases:
 | Windows 10/11 (modern) | [Windows Modern](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-modern.zip) |
 | Windows 10 old builds / 8.1 / 7 SP1 | [Windows Legacy](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-legacy.zip) |
 | Linux x64 | [Linux x64](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-linux-x64.zip) |
-| macOS Intel | [macOS Intel](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-intel.zip) |
 | macOS Apple Silicon | [macOS Apple Silicon](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-arm64.zip) |
 
 These links point to the latest release. Packages are generated automatically when a version tag such as `v0.1.0` is pushed.

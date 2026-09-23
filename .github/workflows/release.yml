@@ -34,12 +34,6 @@ jobs:
             requirements: requirements.txt
             package: math-equalizer-linux-x64
             pyinstaller: ">=6,<7"
-          - name: macOS Intel
-            os: macos-13
-            python: "3.12"
-            requirements: requirements.txt
-            package: math-equalizer-macos-intel
-            pyinstaller: ">=6,<7"
           - name: macOS Apple Silicon
             os: macos-14
             python: "3.12"
@@ -60,25 +54,49 @@ jobs:
           python -m pip install --upgrade "pip<24.1" || python -m pip install --upgrade pip
           python -m pip install -r "${{ matrix.requirements }}"
           python -m pip install "pyinstaller${{ matrix.pyinstaller }}"
-      - name: Build executable
+      - name: Build executables
         shell: bash
-        run: pyinstaller --noconfirm --clean --windowed --name MATH-EQUALIZER main.py
+        run: |
+          if [ "${{ matrix.name }}" = "Windows Legacy" ]; then
+            QT_EXCLUDE="--exclude-module PySide6"
+          elif [ "${{ matrix.name }}" = "Windows Modern" ]; then
+            QT_EXCLUDE="--exclude-module PySide2"
+          else
+            QT_EXCLUDE=""
+          fi
+
+          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER --distpath dist/normal main.py
+          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER-LowPower --distpath dist/low-power main_low_power.py
+
       - name: Add documentation
         shell: bash
         run: |
-          cp README.md dist/MATH-EQUALIZER/README.md
-          cp LICENSE dist/MATH-EQUALIZER/LICENSE
-          if [ "${{ matrix.name }}" = "Windows Legacy" ]; then cp requirements-legacy-windows.txt dist/MATH-EQUALIZER/requirements-legacy-windows.txt; else cp "${{ matrix.requirements }}" dist/MATH-EQUALIZER/requirements.txt; fi
+          cp README.md dist/normal/MATH-EQUALIZER/README.md
+          cp LICENSE dist/normal/MATH-EQUALIZER/LICENSE
+          cp README.md dist/low-power/MATH-EQUALIZER-LowPower/README.md
+          cp LICENSE dist/low-power/MATH-EQUALIZER-LowPower/LICENSE
+          if [ "${{ matrix.name }}" = "Windows Legacy" ]; then
+            cp requirements-legacy-windows.txt dist/normal/MATH-EQUALIZER/requirements-legacy-windows.txt
+            cp requirements-legacy-windows.txt dist/low-power/MATH-EQUALIZER-LowPower/requirements-legacy-windows.txt
+          else
+            cp "${{ matrix.requirements }}" dist/normal/MATH-EQUALIZER/requirements.txt
+            cp "${{ matrix.requirements }}" dist/low-power/MATH-EQUALIZER-LowPower/requirements.txt
+          fi
+
       - name: Package
         shell: bash
         run: |
-          cd dist
-          7z a "../${{ matrix.package }}.zip" MATH-EQUALIZER
-      - name: Upload workflow artifact
+          cd dist/normal
+          7z a "../../${{ matrix.package }}.zip" MATH-EQUALIZER
+          cd ../low-power
+          7z a "../../${{ matrix.package }}-low-power.zip" MATH-EQUALIZER-LowPower
+      - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}
-          path: ${{ matrix.package }}.zip
+          path: |
+            ${{ matrix.package }}.zip
+            ${{ matrix.package }}-low-power.zip
 
   release:
     name: Create GitHub release
@@ -96,4 +114,15 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" release-assets/*.zip --repo "${GITHUB_REPOSITORY}" --generate-notes --title "MATH-EQUALIZER ${GITHUB_REF_NAME}"
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "release-v0.1.0" ]; then
+            RELEASE_TAG="v0.1.0"
+          else
+            RELEASE_TAG="${GITHUB_REF_NAME}"
+          fi
+
+          if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" release-assets/*.zip --repo "${GITHUB_REPOSITORY}" --clobber
+          else
+            gh release create "${RELEASE_TAG}" release-assets/*.zip --repo "${GITHUB_REPOSITORY}" --generate-notes --title "MATH-EQUALIZER ${RELEASE_TAG}"
+          fi
