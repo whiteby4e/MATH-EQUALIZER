@@ -43,17 +43,19 @@ from .visualizer import (
 
 class MainWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, low_power=False):
 
         super().__init__()
+
+        self.low_power = low_power
 
         self.setWindowTitle(
             "Math Equalizer v0.1"
         )
 
         self.resize(
-            1100,
-            800
+            900 if low_power else 1100,
+            650 if low_power else 800
         )
 
         self.processor = None
@@ -67,7 +69,7 @@ class MainWindow(QMainWindow):
 
         self.timer = QTimer(self)
 
-        self.timer.setInterval(50)
+        self.timer.setInterval(200 if self.low_power else 50)
 
         self.timer.timeout.connect(
             self._tick
@@ -222,12 +224,17 @@ class MainWindow(QMainWindow):
             self.status_label
         )
 
-        self.visualizer = Visualizer()
+        self.visualizer = Visualizer(low_power=self.low_power)
 
-        root.addWidget(
-            self.visualizer,
-            1
-        )
+        if not self.low_power:
+            root.addWidget(
+                self.visualizer,
+                1
+            )
+        else:
+            low_power_note = QLabel("Low Power Mode: visualization disabled to reduce CPU/RAM usage.")
+            low_power_note.setStyleSheet("color: #777;")
+            root.addWidget(low_power_note)
 
         buttons = QHBoxLayout()
 
@@ -329,7 +336,8 @@ class MainWindow(QMainWindow):
             self.processor = (
                 RealTimeProcessor(
                     audio,
-                    info.sample_rate
+                    info.sample_rate,
+                    low_power=self.low_power
                 )
             )
 
