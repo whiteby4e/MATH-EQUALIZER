@@ -1,0 +1,7 @@
+# Windows 7 SP1 through old Windows 10 builds such as 15063.
+# Use Python 3.8.x for this legacy build.
+numpy==1.24.4
+sounddevice==0.4.6
+soundfile==0.12.1
+PySide2==5.15.2.1
+matplotlib==3.7.5
