@@ -83,6 +83,33 @@ Manual commands:
 `python main.py --legacy-windows --low-power`
 
 The legacy and modern launchers use separate virtual environments (`.venv-legacy` and `.venv`) so their Qt versions do not conflict.
+## Platform launch links
+
+Use the launcher that matches your operating system:
+
+### Windows
+
+| Windows version | Launcher |
+|---|---|
+| Windows 7 SP1 | [Windows 7 launcher](math_equalizer/run_windows_7.bat) |
+| Windows 8.1 | [Windows 8.1 launcher](math_equalizer/run_windows_8_1.bat) |
+| Windows 10 old builds, including 15063 (1703) | [Windows 10 Legacy launcher](math_equalizer/run_windows_10_legacy.bat) |
+| Windows 10/11 current builds | [Windows 10/11 launcher](math_equalizer/run_windows_10_11.bat) |
+
+Legacy Windows uses Python 3.8.x and the PySide2/Qt 5 compatibility path.
+
+### Linux
+
+- [Linux normal launcher](math_equalizer/run_linux.sh)
+- [Linux Low Power launcher](math_equalizer/run_linux_low_power.sh)
+
+### macOS
+
+- [macOS normal launcher](math_equalizer/run_macos.sh)
+- [macOS Low Power launcher](math_equalizer/run_macos_low_power.sh)
+
+The Linux and macOS launchers use the modern Python/PySide6 dependency set. Run shell launchers with "bash" if the executable bit is not preserved by your download method.
+
 ## Requirements
 
 - Python 3.10 or newer for the modern build
