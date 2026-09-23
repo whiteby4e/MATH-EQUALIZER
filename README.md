@@ -110,6 +110,19 @@ Legacy Windows uses Python 3.8.x and the PySide2/Qt 5 compatibility path.
 
 The Linux and macOS launchers use the modern Python/PySide6 dependency set. Run shell launchers with "bash" if the executable bit is not preserved by your download method.
 
+## Downloads
+
+Prebuilt packages are published as GitHub Releases:
+
+| Platform | Download |
+|---|---|
+| Windows 10/11 (modern) | [Windows Modern](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-modern.zip) |
+| Windows 10 old builds / 8.1 / 7 SP1 | [Windows Legacy](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-legacy.zip) |
+| Linux x64 | [Linux x64](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-linux-x64.zip) |
+| macOS Intel | [macOS Intel](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-intel.zip) |
+| macOS Apple Silicon | [macOS Apple Silicon](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-arm64.zip) |
+
+These links point to the latest release. Packages are generated automatically when a version tag such as `v0.1.0` is pushed.
 ## Requirements
 
 - Python 3.10 or newer for the modern build
