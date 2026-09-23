@@ -34,12 +34,6 @@ jobs:
             requirements: requirements.txt
             package: math-equalizer-linux-x64
             pyinstaller: ">=6,<7"
-          - name: macOS Intel
-            os: macos-13
-            python: "3.12"
-            requirements: requirements.txt
-            package: math-equalizer-macos-intel
-            pyinstaller: ">=6,<7"
           - name: macOS Apple Silicon
             os: macos-14
             python: "3.12"
