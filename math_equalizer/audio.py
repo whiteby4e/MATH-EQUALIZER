@@ -23,7 +23,8 @@ class RealTimeProcessor:
     def __init__(
         self,
         audio: np.ndarray,
-        sample_rate: int
+        sample_rate: int,
+        low_power: bool = False
     ):
         if audio.ndim == 1:
             audio = audio[:, None]
@@ -35,9 +36,11 @@ class RealTimeProcessor:
 
         self.sample_rate = int(sample_rate)
         self.channels = self.audio.shape[1]
+        self.low_power = low_power
 
-        self.fft_size = 2048
-        self.hop = 512
+        # Smaller FFT + no overlap in Low Power Mode reduces CPU usage.
+        self.fft_size = 1024 if low_power else 2048
+        self.hop = 1024 if low_power else 512
 
         self.window = np.sqrt(
             np.hanning(self.fft_size)
