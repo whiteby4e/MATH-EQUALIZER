@@ -55,9 +55,38 @@ The final gain is limited by the audio processor to keep the output in a safe nu
 | TREBLE | 4 kHz and above |
 | FULL | Entire spectrum |
 
+## Windows compatibility
+
+MATH-EQUALIZER now has two Windows GUI paths:
+
+| Windows | Build | GUI stack |
+|---|---|---|
+| Windows 10/11 | Modern | PySide6 / Qt 6 |
+| Windows 10 old builds, including 15063 (1703) | Legacy | PySide2 / Qt 5 |
+| Windows 8.1 | Legacy | PySide2 / Qt 5 |
+| Windows 7 SP1 | Legacy | PySide2 / Qt 5 |
+
+The legacy path is separate from the modern dependencies because current Qt 6/PySide6 releases do not target Windows 7/8.1 and require newer Windows 10 builds.
+
+For legacy Windows, use Python 3.8.x and the dedicated launcher.
+
+### Legacy Windows
+
+Run: `math_equalizer/run_windows_legacy.bat`
+
+For older or weaker legacy PCs, use: `math_equalizer/run_windows_legacy_low_power.bat`
+
+Manual commands:
+
+`python main.py --legacy-windows`
+
+`python main.py --legacy-windows --low-power`
+
+The legacy and modern launchers use separate virtual environments (`.venv-legacy` and `.venv`) so their Qt versions do not conflict.
 ## Requirements
 
-- Python 3.10 or newer
+- Python 3.10 or newer for the modern build
+- Python 3.8.x for the legacy Windows build
 - Windows, Linux, or macOS
 - A working audio output device
 
