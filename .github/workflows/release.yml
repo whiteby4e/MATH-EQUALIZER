@@ -65,11 +65,8 @@ jobs:
             QT_EXCLUDE=""
           fi
 
-          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER main.py
-          mv dist/MATH-EQUALIZER dist/MATH-EQUALIZER-Normal
-
-          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER-LowPower main.py -- --low-power
-          mv dist/MATH-EQUALIZER-LowPower dist/MATH-EQUALIZER-LowPower
+          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER --distpath dist/normal main.py
+          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER-LowPower --distpath dist/low-power main_low_power.py
 
       - name: Add documentation
         shell: bash
