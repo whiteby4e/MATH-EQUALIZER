@@ -36,9 +36,17 @@ from .formula import (
     SafeFormula
 )
 
-from .visualizer import (
-    Visualizer
-)
+class LightweightVisualizer:
+    """No-op visualizer used in Low Power Mode."""
+
+    def update_formula(self, formula, current_time):
+        pass
+
+    def update_spectrum(self, samples, sample_rate):
+        pass
+
+    def refresh(self):
+        pass
 
 
 class MainWindow(QMainWindow):
@@ -224,7 +232,11 @@ class MainWindow(QMainWindow):
             self.status_label
         )
 
-        self.visualizer = Visualizer(low_power=self.low_power)
+        if self.low_power:
+            self.visualizer = LightweightVisualizer()
+        else:
+            from .visualizer import Visualizer
+            self.visualizer = Visualizer()
 
         if not self.low_power:
             root.addWidget(
@@ -540,11 +552,13 @@ class MainWindow(QMainWindow):
 
 def run():
 
+    low_power = "--low-power" in sys.argv or "-L" in sys.argv
+
     app = QApplication(
         sys.argv
     )
 
-    window = MainWindow()
+    window = MainWindow(low_power=low_power)
 
     window.show()
 
