@@ -54,32 +54,51 @@ jobs:
           python -m pip install --upgrade "pip<24.1" || python -m pip install --upgrade pip
           python -m pip install -r "${{ matrix.requirements }}"
           python -m pip install "pyinstaller${{ matrix.pyinstaller }}"
-      - name: Build executable
+      - name: Build executables
         shell: bash
         run: |
           if [ "${{ matrix.name }}" = "Windows Legacy" ]; then
-            python -m PyInstaller --noconfirm --clean --windowed --exclude-module PySide6 --name MATH-EQUALIZER main.py
+            QT_EXCLUDE="--exclude-module PySide6"
           elif [ "${{ matrix.name }}" = "Windows Modern" ]; then
-            python -m PyInstaller --noconfirm --clean --windowed --exclude-module PySide2 --name MATH-EQUALIZER main.py
+            QT_EXCLUDE="--exclude-module PySide2"
           else
-            python -m PyInstaller --noconfirm --clean --windowed --name MATH-EQUALIZER main.py
+            QT_EXCLUDE=""
           fi
+
+          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER main.py
+          mv dist/MATH-EQUALIZER dist/MATH-EQUALIZER-Normal
+
+          python -m PyInstaller --noconfirm --clean --windowed $QT_EXCLUDE --name MATH-EQUALIZER-LowPower main.py -- --low-power
+          mv dist/MATH-EQUALIZER-LowPower dist/MATH-EQUALIZER-LowPower
+
       - name: Add documentation
         shell: bash
         run: |
-          cp README.md dist/MATH-EQUALIZER/README.md
-          cp LICENSE dist/MATH-EQUALIZER/LICENSE
-          if [ "${{ matrix.name }}" = "Windows Legacy" ]; then cp requirements-legacy-windows.txt dist/MATH-EQUALIZER/requirements-legacy-windows.txt; else cp "${{ matrix.requirements }}" dist/MATH-EQUALIZER/requirements.txt; fi
+          for dir in dist/MATH-EQUALIZER-Normal dist/MATH-EQUALIZER-LowPower; do
+            cp README.md "$dir/README.md"
+            cp LICENSE "$dir/LICENSE"
+          done
+          if [ "${{ matrix.name }}" = "Windows Legacy" ]; then
+            cp requirements-legacy-windows.txt dist/MATH-EQUALIZER-Normal/requirements-legacy-windows.txt
+            cp requirements-legacy-windows.txt dist/MATH-EQUALIZER-LowPower/requirements-legacy-windows.txt
+          else
+            cp "${{ matrix.requirements }}" dist/MATH-EQUALIZER-Normal/requirements.txt
+            cp "${{ matrix.requirements }}" dist/MATH-EQUALIZER-LowPower/requirements.txt
+          fi
+
       - name: Package
         shell: bash
         run: |
           cd dist
-          7z a "../${{ matrix.package }}.zip" MATH-EQUALIZER
-      - name: Upload workflow artifact
+          7z a "../${{ matrix.package }}.zip" MATH-EQUALIZER-Normal
+          7z a "../${{ matrix.package }}-low-power.zip" MATH-EQUALIZER-LowPower
+      - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}
-          path: ${{ matrix.package }}.zip
+          path: |
+            ${{ matrix.package }}.zip
+            ${{ matrix.package }}-low-power.zip
 
   release:
     name: Create GitHub release
