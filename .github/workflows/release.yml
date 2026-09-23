@@ -71,24 +71,25 @@ jobs:
       - name: Add documentation
         shell: bash
         run: |
-          for dir in dist/MATH-EQUALIZER-Normal dist/MATH-EQUALIZER-LowPower; do
-            cp README.md "$dir/README.md"
-            cp LICENSE "$dir/LICENSE"
-          done
+          cp README.md dist/normal/MATH-EQUALIZER/README.md
+          cp LICENSE dist/normal/MATH-EQUALIZER/LICENSE
+          cp README.md dist/low-power/MATH-EQUALIZER-LowPower/README.md
+          cp LICENSE dist/low-power/MATH-EQUALIZER-LowPower/LICENSE
           if [ "${{ matrix.name }}" = "Windows Legacy" ]; then
-            cp requirements-legacy-windows.txt dist/MATH-EQUALIZER-Normal/requirements-legacy-windows.txt
-            cp requirements-legacy-windows.txt dist/MATH-EQUALIZER-LowPower/requirements-legacy-windows.txt
+            cp requirements-legacy-windows.txt dist/normal/MATH-EQUALIZER/requirements-legacy-windows.txt
+            cp requirements-legacy-windows.txt dist/low-power/MATH-EQUALIZER-LowPower/requirements-legacy-windows.txt
           else
-            cp "${{ matrix.requirements }}" dist/MATH-EQUALIZER-Normal/requirements.txt
-            cp "${{ matrix.requirements }}" dist/MATH-EQUALIZER-LowPower/requirements.txt
+            cp "${{ matrix.requirements }}" dist/normal/MATH-EQUALIZER/requirements.txt
+            cp "${{ matrix.requirements }}" dist/low-power/MATH-EQUALIZER-LowPower/requirements.txt
           fi
 
       - name: Package
         shell: bash
         run: |
-          cd dist
-          7z a "../${{ matrix.package }}.zip" MATH-EQUALIZER-Normal
-          7z a "../${{ matrix.package }}-low-power.zip" MATH-EQUALIZER-LowPower
+          cd dist/normal
+          7z a "../../${{ matrix.package }}.zip" MATH-EQUALIZER
+          cd ../low-power
+          7z a "../../${{ matrix.package }}-low-power.zip" MATH-EQUALIZER-LowPower
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
