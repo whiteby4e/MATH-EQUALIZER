@@ -58,8 +58,9 @@ jobs:
         shell: bash
         run: |
           if [ "${{ matrix.name }}" = "Windows Legacy" ]; then
-            export MATH_EQUALIZER_LEGACY_WINDOWS=1
             python -m PyInstaller --noconfirm --clean --windowed --exclude-module PySide6 --name MATH-EQUALIZER main.py
+          elif [ "${{ matrix.name }}" = "Windows Modern" ]; then
+            python -m PyInstaller --noconfirm --clean --windowed --exclude-module PySide2 --name MATH-EQUALIZER main.py
           else
             python -m PyInstaller --noconfirm --clean --windowed --name MATH-EQUALIZER main.py
           fi
