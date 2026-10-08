@@ -5,15 +5,24 @@ from pathlib import Path
 
 import numpy as np
 
-from .qt_compat import QApplication, QFileDialog, QComboBox, QFormLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMessageBox, QPushButton, QTimer, Qt, QVBoxLayout, QWidget, exec_app
+from .qt_compat import (
+    QApplication, QFileDialog, QComboBox, QFormLayout, QGroupBox,
+    QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMessageBox, QPushButton,
+    QTimer, Qt, QVBoxLayout, QWidget, exec_app,
+)
 from .audio import RealTimeProcessor, load_audio
 from .formula import FormulaError, SafeFormula
 
 
 class LightweightVisualizer:
-    def update_formula(self, formula, current_time): pass
-    def update_spectrum(self, samples, sample_rate): pass
-    def refresh(self): pass
+    def update_formula(self, formula, current_time):
+        return None
+
+    def update_spectrum(self, samples, sample_rate):
+        return None
+
+    def refresh(self):
+        return None
 
 
 class MainWindow(QMainWindow):
@@ -148,7 +157,10 @@ class MainWindow(QMainWindow):
             self.play_button.setText("▶ Play"); self.status_label.setText("Finished")
 
     def closeEvent(self, event):
-        if self.processor: self.processor.close()
+        self.timer.stop()
+        if self.processor:
+            self.processor.close()
+            self.processor = None
         event.accept()
 
 
