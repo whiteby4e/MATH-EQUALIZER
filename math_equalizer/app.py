@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import webbrowser
 from pathlib import Path
 
 import numpy as np
@@ -239,6 +240,20 @@ class MainWindow(QMainWindow):
             self.status_label.setText(f"Band: {band}")
 
     def play_pause(self):
+        # Hidden Rick Astley easter egg: accept common spellings without
+        # passing the keyword through the mathematical formula parser.
+        keyword = "".join(self.formula_edit.text().casefold().split())
+        if keyword in {"rickastly", "rickastley", "never gonna give you up".replace(" ", ""), "nevergonnagiveyouup"}:
+            if self.processor:
+                self.processor.close()
+                self.processor = None
+            opened = webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+            self.status_label.setText(
+                "Never gonna give you up! Opening the music video…"
+                if opened else "Could not open the music video in your browser."
+            )
+            return
+
         if self._is_synth_mode():
             if not self.apply_formula():
                 return
