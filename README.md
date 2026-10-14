@@ -12,8 +12,15 @@ MATH-EQUALIZER lets you load an audio file, apply a time-based mathematical form
 - 📈 Real-time formula and FFT visualization
 - ▶️ Play, pause, and stop controls
 - 🔒 Formula expressions are validated with a restricted AST-based evaluator
+- 🎹 Hidden MathRoll procedural-synth Easter egg
 - 🪶 Low Power Mode for older or weaker computers
 - 🪟 Windows launch scripts included
+
+## MathRoll Easter Egg
+
+For a hidden musical surprise, enter `rickastly` in the formula field and choose **Apply Formula**, then press **Play**.
+
+MathRoll generates a short, original retro-pop synth tune locally using mathematical oscillators. It does not need an external audio file or an internet connection, and it does not reproduce the melody or recording of Rick Astley's song. This is an unofficial fan-made Easter egg and tribute; Rick Astley is not affiliated with or endorsing MATH-EQUALIZER.
 
 ## How the formula works
 
@@ -83,6 +90,7 @@ Manual commands:
 `python main.py --legacy-windows --low-power`
 
 The legacy and modern launchers use separate virtual environments (`.venv-legacy` and `.venv`) so their Qt versions do not conflict.
+
 ## Platform launch links
 
 Use the launcher that matches your operating system:
@@ -123,6 +131,7 @@ Prebuilt packages are published as GitHub Releases:
 | macOS Apple Silicon | [macOS Apple Silicon](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-arm64.zip) |
 
 These links point to the latest release. Packages are generated automatically when a version tag such as `v0.1.0` is pushed.
+
 ## Requirements
 
 - Python 3.10 or newer for the modern build
@@ -226,6 +235,7 @@ MATH-EQUALIZER/
     ├── __init__.py
     ├── app.py
     ├── audio.py
+    ├── easter_egg.py
     ├── formula.py
     ├── visualizer.py
     ├── run_windows.bat
@@ -238,7 +248,7 @@ MATH-EQUALIZER/
 - Formula values are evaluated over time and applied to the selected frequency band.
 - Very large or rapidly changing formulas can still require more CPU.
 - Low Power Mode removes visualization overhead but does not guarantee real-time playback on every old computer.
-- The project currently focuses on local audio-file playback.
+- The project currently focuses on local audio-file playback, with MathRoll as a built-in procedural-synth exception.
 
 ## License
 
