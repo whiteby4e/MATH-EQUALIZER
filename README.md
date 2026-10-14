@@ -1,52 +1,57 @@
 # MATH-EQUALIZER
 
-A mathematical audio processor that transforms and manipulates music using formulas and mathematical functions.
-
-MATH-EQUALIZER lets you load an audio file, apply a time-based mathematical formula to a selected frequency range, and hear the result in real time.
+A mathematical audio processor that transforms music with formulas and mathematical functions.
 
 ## Features
 
-- 🎵 Load WAV, AIFF, FLAC, and OGG audio
-- 🧮 Control audio gain with mathematical formulas
-- 🎚️ Apply formulas to BASS, MID, TREBLE, or FULL spectrum
-- 📈 Real-time formula and FFT visualization
-- ▶️ Play, pause, and stop controls
-- 🔒 Formula expressions are validated with a restricted AST-based evaluator
-- 🪶 Low Power Mode for older or weaker computers
-- 🪟 Windows launch scripts included
+- Load WAV, AIFF, FLAC, and OGG audio and apply formulas to BASS, MID, TREBLE, or FULL spectrum.
+- **Generate sound directly from a formula**, without loading an audio file.
+- Compact calculator-style formula editor with shortcut keys for common math functions.
+- Safe, restricted AST-based formula evaluator.
+- Real-time playback controls and optional formula/FFT visualization.
+- Low Power mode for older or weaker computers.
+- Separate modern and legacy Windows GUI paths.
 
-## How the formula works
+## Generate sound from a formula
 
-The variable `t` represents time in seconds.
+Switch **Mode** to **Generate sound from formula**, enter an expression, and press **Generate / Play**.
+
+The variable \`t\` is time in seconds. For example:
+
+\`\`\`text
+sin(2*pi*440*t)
+\`\`\`
+
+This generates a 440 Hz sine wave. Other examples:
+
+| Formula | Result |
+|---|---|
+| \`sin(2*pi*220*t)\` | Lower-pitched sine wave |
+| \`0.5*sin(2*pi*440*t) + 0.25*sin(2*pi*660*t)\` | Two-tone blend |
+| \`sin(2*pi*(220+80*sin(2*pi*2*t))*t)\` | Wobbling, synthesizer-like tone |
+| \`0\` | Silence |
+
+Output is clipped to the range -1 to 1. Playback is limited to 30 seconds per pass and can be restarted. The Low Power build uses 22.05 kHz synthesis; the normal build uses 44.1 kHz.
+
+Supported constants and functions:
+
+\`\`\`text
+pi, e, sin, cos, tan, exp, sqrt, abs, log, log10, floor, ceil
+\`\`\`
+
+Use multiplication explicitly: \`2*pi*440*t\`. The formula evaluator does not use Python's \`eval\` environment directly; it validates a restricted expression tree before evaluation.
+
+## Process an audio file
+
+Switch **Mode** to **Process an audio file**, choose a supported audio file, enter a gain formula, select the frequency band, and press Play.
 
 Example:
 
-```text
+\`\`\`text
 1 + 0.5*sin(2*pi*2*t)
-```
+\`\`\`
 
-This creates a gain value that changes over time.
-
-Available constants and functions include:
-
-```text
-pi
-e
-sin
-cos
-tan
-exp
-sqrt
-abs
-log
-log10
-floor
-ceil
-```
-
-The final gain is limited by the audio processor to keep the output in a safe numerical range.
-
-## Frequency bands
+This varies the gain over time. Frequency bands:
 
 | Band | Frequency range |
 |---|---|
@@ -55,190 +60,64 @@ The final gain is limited by the audio processor to keep the output in a safe nu
 | TREBLE | 4 kHz and above |
 | FULL | Entire spectrum |
 
+## Low Power Mode
+
+Low Power mode reduces work on older computers by disabling live graphs, avoiding Matplotlib, using a smaller FFT and larger processing hop for file processing, reducing the synthesis sample rate, and refreshing the interface less often. It preserves the main playback and formula features. Results depend on the computer and audio device.
+
+Run manually:
+
+\`\`\`bash
+python main.py --low-power
+\`\`\`
+
+For legacy Windows:
+
+\`\`\`bat
+python main.py --legacy-windows --low-power
+\`\`\`
+
 ## Windows compatibility
 
-MATH-EQUALIZER now has two Windows GUI paths:
-
-| Windows | Build | GUI stack |
+| Windows | GUI stack | Python |
 |---|---|---|
-| Windows 10/11 | Modern | PySide6 / Qt 6 |
-| Windows 10 old builds, including 15063 (1703) | Legacy | PySide2 / Qt 5 |
-| Windows 8.1 | Legacy | PySide2 / Qt 5 |
-| Windows 7 SP1 | Legacy | PySide2 / Qt 5 |
+| Windows 10/11 current builds | Modern: PySide6 / Qt 6 | Python 3.10+ |
+| Windows 10 old builds, including 15063 (1703) | Legacy: PySide2 / Qt 5 | Python 3.8.x |
+| Windows 8.1 | Legacy: PySide2 / Qt 5 | Python 3.8.x |
+| Windows 7 SP1 | Legacy: PySide2 / Qt 5 | Python 3.8.x |
 
-The legacy path is separate from the modern dependencies because current Qt 6/PySide6 releases do not target Windows 7/8.1 and require newer Windows 10 builds.
+Use the matching launcher:
 
-For legacy Windows, use Python 3.8.x and the dedicated launcher.
+- Windows 7: \`math_equalizer/run_windows_7.bat\`
+- Windows 8.1: \`math_equalizer/run_windows_8_1.bat\`
+- Windows 10 old builds: \`math_equalizer/run_windows_10_legacy.bat\`
+- Current Windows 10/11: \`math_equalizer/run_windows_10_11.bat\`
+- Windows Low Power: \`math_equalizer/run_windows_low_power.bat\`
+- Legacy Windows Low Power: \`math_equalizer/run_windows_legacy_low_power.bat\`
 
-### Legacy Windows
+Modern and legacy environments are separated to prevent Qt dependency conflicts.
 
-Run: `math_equalizer/run_windows_legacy.bat`
+## Other platforms
 
-For older or weaker legacy PCs, use: `math_equalizer/run_windows_legacy_low_power.bat`
-
-Manual commands:
-
-`python main.py --legacy-windows`
-
-`python main.py --legacy-windows --low-power`
-
-The legacy and modern launchers use separate virtual environments (`.venv-legacy` and `.venv`) so their Qt versions do not conflict.
-## Platform launch links
-
-Use the launcher that matches your operating system:
-
-### Windows
-
-| Windows version | Launcher |
-|---|---|
-| Windows 7 SP1 | [Windows 7 launcher](math_equalizer/run_windows_7.bat) |
-| Windows 8.1 | [Windows 8.1 launcher](math_equalizer/run_windows_8_1.bat) |
-| Windows 10 old builds, including 15063 (1703) | [Windows 10 Legacy launcher](math_equalizer/run_windows_10_legacy.bat) |
-| Windows 10/11 current builds | [Windows 10/11 launcher](math_equalizer/run_windows_10_11.bat) |
-
-Legacy Windows uses Python 3.8.x and the PySide2/Qt 5 compatibility path.
-
-### Linux
-
-- [Linux normal launcher](math_equalizer/run_linux.sh)
-- [Linux Low Power launcher](math_equalizer/run_linux_low_power.sh)
-
-### macOS
-
-- [macOS normal launcher](math_equalizer/run_macos.sh)
-- [macOS Low Power launcher](math_equalizer/run_macos_low_power.sh)
-
-The Linux and macOS launchers use the modern Python/PySide6 dependency set. Run shell launchers with "bash" if the executable bit is not preserved by your download method.
-
-## Downloads
-
-Prebuilt packages are published as GitHub Releases:
-
-| Platform | Download |
-|---|---|
-| Windows 10/11 (modern) | [Windows Modern](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-modern.zip) |
-| Windows 10 old builds / 8.1 / 7 SP1 | [Windows Legacy](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-legacy.zip) |
-| Linux x64 | [Linux x64](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-linux-x64.zip) |
-| macOS Intel | [macOS Intel](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-intel.zip) |
-| macOS Apple Silicon | [macOS Apple Silicon](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-arm64.zip) |
-
-These links point to the latest release. Packages are generated automatically when a version tag such as `v0.1.0` is pushed.
-## Requirements
-
-- Python 3.10 or newer for the modern build
-- Python 3.8.x for the legacy Windows build
-- Windows, Linux, or macOS
-- A working audio output device
+- Linux: \`math_equalizer/run_linux.sh\` or \`math_equalizer/run_linux_low_power.sh\`
+- macOS: \`math_equalizer/run_macos.sh\` or \`math_equalizer/run_macos_low_power.sh\`
 
 ## Installation
 
-Clone the repository:
-
-```bash
+\`\`\`bash
 git clone https://github.com/whiteby4e/MATH-EQUALIZER.git
 cd MATH-EQUALIZER
-```
-
-Create a virtual environment:
-
-```bash
 python -m venv .venv
-```
-
-Activate it on Windows:
-
-```bat
-.venv\\Scripts\\activate
-```
-
-Install the dependencies:
-
-```bash
 python -m pip install -r requirements.txt
-```
-
-Run:
-
-```bash
 python main.py
-```
+\`\`\`
 
-## Windows
+Use \`requirements-legacy-windows.txt\` and Python 3.8.x for the legacy Windows path. The project uses NumPy, sounddevice, soundfile, and PySide; Matplotlib is only needed for the normal visualization mode.
 
-For normal mode, run:
+## Tests
 
-```text
-math_equalizer/run_windows.bat
-```
-
-The script creates the virtual environment if needed, installs dependencies, and starts the application.
-
-## Low Power Mode
-
-Older computers can use **Low Power Mode** to reduce CPU and RAM usage.
-
-Low Power Mode:
-
-- disables the live graphs
-- avoids loading Matplotlib
-- uses a smaller FFT size
-- uses a larger processing hop
-- updates the lightweight interface less often
-- keeps the main audio-processing functionality
-
-### Windows
-
-Run:
-
-```text
-math_equalizer/run_windows_low_power.bat
-```
-
-Or start it manually:
-
-```bash
-python main.py --low-power
-```
-
-The low-power launcher uses `requirements-lite.txt`, which does not install Matplotlib.
-
-### When to use it
-
-Use Low Power Mode if the normal version causes:
-
-- high CPU usage
-- audio dropouts
-- slow interface response
-- excessive memory usage
-
-The normal mode is intended for computers that can comfortably handle real-time FFT visualization.
-
-## Project structure
-
-```text
-MATH-EQUALIZER/
-├── main.py
-├── requirements.txt
-├── requirements-lite.txt
-├── LICENSE
-├── README.md
-└── math_equalizer/
-    ├── __init__.py
-    ├── app.py
-    ├── audio.py
-    ├── formula.py
-    ├── visualizer.py
-    ├── run_windows.bat
-    └── run_windows_low_power.bat
-```
-
-## Notes
-
-- This project changes audio using mathematical gain functions; it is an experimental audio-processing project rather than a conventional graphic equalizer.
-- Formula values are evaluated over time and applied to the selected frequency band.
-- Very large or rapidly changing formulas can still require more CPU.
-- Low Power Mode removes visualization overhead but does not guarantee real-time playback on every old computer.
-- The project currently focuses on local audio-file playback.
+\`\`\`bash
+python -m pytest
+\`\`\`
 
 ## License
 
