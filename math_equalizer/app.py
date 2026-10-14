@@ -11,6 +11,7 @@ from .qt_compat import (
     QTimer, Qt, QVBoxLayout, QWidget, exec_app,
 )
 from .audio import RealTimeProcessor, load_audio
+from .easter_egg import make_mathroll
 from .formula import FormulaError, SafeFormula
 
 
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow):
         self.audio = None
         self.sample_rate = None
         self.audio_path = None
+        self.mathroll_active = False
         self.formula = SafeFormula("1")
         self._build_ui()
         self.timer = QTimer(self)
@@ -102,14 +104,17 @@ class MainWindow(QMainWindow):
 
     def choose_audio(self):
         path, _ = QFileDialog.getOpenFileName(self, "Choose audio", "", "Audio files (*.wav *.aiff *.aif *.flac *.ogg);;All files (*.*)")
-        if not path: return
+        if not path:
+            return
         try:
-            if self.processor: self.processor.close()
+            if self.processor:
+                self.processor.close()
             audio, info = load_audio(path)
             self.audio, self.sample_rate, self.audio_path = audio, info.sample_rate, Path(path)
             self.processor = RealTimeProcessor(audio, info.sample_rate, low_power=self.low_power)
             self.processor.set_formula(self.formula)
             self.processor.set_band(self.band_combo.currentText())
+            self.mathroll_active = False
             self.file_label.setText(f"{self.audio_path.name} • {info.duration:.1f}s • {info.sample_rate} Hz • {info.channels} ch")
             self.status_label.setText("Audio loaded. Press Play.")
             self.play_button.setText("▶ Play")
@@ -118,43 +123,81 @@ class MainWindow(QMainWindow):
 
     def apply_formula(self):
         text = self.formula_edit.text().strip()
+
+        # Secret keyword: generate an original tune locally, with no audio file
+        # or network access. It is a retro-pop tribute, not the original song.
+        if text.casefold() == "rickastly":
+            try:
+                if self.processor:
+                    self.processor.close()
+                self.sample_rate = 22050
+                self.audio = make_mathroll(self.sample_rate)
+                self.audio_path = None
+                self.formula = SafeFormula("1")
+                self.processor = RealTimeProcessor(
+                    self.audio, self.sample_rate, low_power=self.low_power
+                )
+                self.processor.set_formula(self.formula)
+                self.processor.set_band("FULL")
+                self.mathroll_active = True
+                self.band_combo.setCurrentText("FULL")
+                self.file_label.setText("MathRoll • original procedural synth • 8.0s")
+                self.status_label.setText("🎹 MathRoll unlocked! Press Play.")
+            except Exception as exc:
+                QMessageBox.critical(self, "MathRoll error", str(exc))
+            return
+
         try:
             formula = SafeFormula(text)
             formula.evaluate(np.array([0.0, 0.5, 1.0]))
         except FormulaError as exc:
-            QMessageBox.warning(self, "Invalid formula", str(exc)); return
+            QMessageBox.warning(self, "Invalid formula", str(exc))
+            return
         self.formula = formula
-        if self.processor: self.processor.set_formula(formula)
+        self.mathroll_active = False
+        if self.processor:
+            self.processor.set_formula(formula)
         self.status_label.setText(f"Formula active: {text}")
 
     def change_band(self, band):
-        if self.processor: self.processor.set_band(band)
+        if self.processor:
+            self.processor.set_band(band)
         self.status_label.setText(f"Band: {band}")
 
     def play_pause(self):
         if not self.processor:
-            QMessageBox.information(self, "No audio", "Choose an audio file first."); return
+            QMessageBox.information(self, "No audio", "Choose an audio file first, or enter rickastly and press Apply Formula.")
+            return
         if self.processor.playing:
-            self.processor.pause(); self.play_button.setText("▶ Play"); self.status_label.setText("Paused")
+            self.processor.pause()
+            self.play_button.setText("▶ Play")
+            self.status_label.setText("Paused")
         else:
             try:
-                self.processor.start(); self.play_button.setText("Ⅱ Pause"); self.status_label.setText("Playing")
+                self.processor.start()
+                self.play_button.setText("Ⅱ Pause")
+                self.status_label.setText("Playing MathRoll 🎹" if self.mathroll_active else "Playing")
             except Exception as exc:
                 QMessageBox.critical(self, "Audio output error", str(exc))
 
     def stop(self):
         if self.processor:
-            self.processor.stop(); self.play_button.setText("▶ Play"); self.status_label.setText("Stopped")
+            self.processor.stop()
+            self.play_button.setText("▶ Play")
+            self.status_label.setText("MathRoll stopped" if self.mathroll_active else "Stopped")
 
     def _tick(self):
-        if not self.processor: return
+        if not self.processor:
+            return
         position = self.processor.current_time
         self.visualizer.update_formula(self.formula, position)
         recent = self.processor.get_recent_output(4096)
-        if recent is not None: self.visualizer.update_spectrum(recent, self.sample_rate)
+        if recent is not None:
+            self.visualizer.update_spectrum(recent, self.sample_rate)
         self.visualizer.refresh()
         if self.processor.finished and not self.processor.playing:
-            self.play_button.setText("▶ Play"); self.status_label.setText("Finished")
+            self.play_button.setText("▶ Play")
+            self.status_label.setText("MathRoll finished 🎵" if self.mathroll_active else "Finished")
 
     def closeEvent(self, event):
         self.timer.stop()
