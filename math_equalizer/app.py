@@ -154,6 +154,7 @@ class MainWindow(QMainWindow):
         if self._is_synth_mode():
             if self.formula_edit.text().strip() == FILE_FORMULA:
                 self.formula_edit.setText(SYNTH_FORMULA)
+                self.formula = SafeFormula(SYNTH_FORMULA)
             self.audio_box.hide()
             self.band_combo.hide()
             self.band_label.hide()
@@ -165,6 +166,7 @@ class MainWindow(QMainWindow):
         else:
             if self.formula_edit.text().strip() == SYNTH_FORMULA:
                 self.formula_edit.setText(FILE_FORMULA)
+                self.formula = SafeFormula(FILE_FORMULA)
             self.audio_box.show()
             self.band_combo.show()
             self.band_label.show()
