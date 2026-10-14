@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         self.resize(680 if low_power else 760, 470 if low_power else 590)
         self.processor = None
         self.audio = None
+        self.audio_sample_rate = None
         self.sample_rate = None
         self.audio_path = None
         self.formula = SafeFormula(FILE_FORMULA)
@@ -170,10 +171,11 @@ class MainWindow(QMainWindow):
             self.help_text.setText(
                 "t = time in seconds • sin, cos, tan, exp, sqrt, abs, log, log10, pi, e"
             )
-            if self.audio is not None and self.sample_rate is not None:
+            if self.audio is not None and self.audio_sample_rate is not None:
                 self.processor = RealTimeProcessor(
-                    self.audio, self.sample_rate, low_power=self.low_power
+                    self.audio, self.audio_sample_rate, low_power=self.low_power
                 )
+                self.sample_rate = self.audio_sample_rate
                 self.processor.set_formula(self.formula)
                 self.processor.set_band(self.band_combo.currentText())
             self.play_button.setText("▶ Play")
@@ -196,7 +198,8 @@ class MainWindow(QMainWindow):
                 self.processor.close()
                 self.processor = None
             audio, info = load_audio(path)
-            self.audio, self.sample_rate, self.audio_path = audio, info.sample_rate, Path(path)
+            self.audio, self.audio_sample_rate = audio, info.sample_rate
+            self.sample_rate, self.audio_path = info.sample_rate, Path(path)
             self.processor = RealTimeProcessor(audio, info.sample_rate, low_power=self.low_power)
             self.processor.set_formula(self.formula)
             self.processor.set_band(self.band_combo.currentText())
