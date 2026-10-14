@@ -170,8 +170,17 @@ class MainWindow(QMainWindow):
             self.help_text.setText(
                 "t = time in seconds • sin, cos, tan, exp, sqrt, abs, log, log10, pi, e"
             )
+            if self.audio is not None and self.sample_rate is not None:
+                self.processor = RealTimeProcessor(
+                    self.audio, self.sample_rate, low_power=self.low_power
+                )
+                self.processor.set_formula(self.formula)
+                self.processor.set_band(self.band_combo.currentText())
             self.play_button.setText("▶ Play")
-            self.status_label.setText("Choose an audio file to begin.")
+            self.status_label.setText(
+                "Audio loaded. Press Play." if self.audio is not None
+                else "Choose an audio file to begin."
+            )
 
     def choose_audio(self):
         if self._is_synth_mode():
@@ -208,7 +217,7 @@ class MainWindow(QMainWindow):
             formula.evaluate(probe)
         except (FormulaError, ValueError, FloatingPointError) as exc:
             QMessageBox.warning(self, "Invalid formula", str(exc))
-            return
+            return False
         self.formula = formula
         if self.processor:
             self.processor.set_formula(formula)
@@ -216,6 +225,7 @@ class MainWindow(QMainWindow):
             "Synthesis formula ready." if self._is_synth_mode()
             else f"Formula active: {text}"
         )
+        return True
 
     def change_band(self, band):
         if self.processor and not self._is_synth_mode():
@@ -224,11 +234,10 @@ class MainWindow(QMainWindow):
             self.status_label.setText(f"Band: {band}")
 
     def play_pause(self):
-        if self.processor is None:
-            if self._is_synth_mode():
-                self.apply_formula()
-                if self.status_label.text().startswith("Invalid"):
-                    return
+        if self._is_synth_mode():
+            if not self.apply_formula():
+                return
+            if self.processor is None:
                 try:
                     self.processor = FormulaSynthProcessor(
                         self.formula, low_power=self.low_power
@@ -237,9 +246,9 @@ class MainWindow(QMainWindow):
                 except Exception as exc:
                     QMessageBox.critical(self, "Could not prepare synthesis", str(exc))
                     return
-            else:
-                QMessageBox.information(self, "No audio", "Choose an audio file first.")
-                return
+        elif self.processor is None:
+            QMessageBox.information(self, "No audio", "Choose an audio file first.")
+            return
 
         if self.processor.playing:
             self.processor.pause()
