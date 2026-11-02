@@ -1,255 +1,168 @@
+<div align="center">
+
 # MATH-EQUALIZER
 
-A mathematical audio processor that transforms and manipulates music using formulas and mathematical functions.
+**Shape sound with mathematics.**
 
-MATH-EQUALIZER lets you load an audio file, apply a time-based mathematical formula to a selected frequency range, and hear the result in real time.
+An experimental audio processor that applies time-dependent mathematical gain functions to selected frequency bands — with live playback and visual feedback.
 
-## Features
+[Features](#-features) · [Quick start](#-quick-start) · [Formula guide](#-formula-guide) · [Downloads](#-downloads) · [Compatibility](#-compatibility)
 
-- 🎵 Load WAV, AIFF, FLAC, and OGG audio
-- 🧮 Control audio gain with mathematical formulas
-- 🎚️ Apply formulas to BASS, MID, TREBLE, or FULL spectrum
-- 📈 Real-time formula and FFT visualization
-- ▶️ Play, pause, and stop controls
-- 🔒 Formula expressions are validated with a restricted AST-based evaluator
-- 🎹 Hidden MathRoll procedural-synth Easter egg
-- 🪶 Low Power Mode for older or weaker computers
-- 🪟 Windows launch scripts included
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-informational)
 
-## MathRoll Easter Egg
+</div>
 
-For a hidden musical surprise, enter `rickastly` in the formula field and choose **Apply Formula**, then press **Play**.
+---
 
-MathRoll generates a short, original retro-pop synth tune locally using mathematical oscillators. It does not need an external audio file or an internet connection, and it does not reproduce the melody or recording of Rick Astley's song. This is an unofficial fan-made Easter egg and tribute; Rick Astley is not affiliated with or endorsing MATH-EQUALIZER.
+## 🎛️ What is it?
 
-## How the formula works
+MATH-EQUALIZER lets you load an audio file, choose a frequency band, and control its gain with a mathematical expression that changes over time. Instead of drawing a conventional EQ curve, you describe how the gain should behave.
 
-The variable `t` represents time in seconds.
+It is an experimental **math-driven audio processor**, not a traditional graphic equalizer.
 
-Example:
+## ✨ Features
+
+- Load WAV, AIFF, FLAC, and OGG audio.
+- Apply formulas to **BASS**, **MID**, **TREBLE**, or the **FULL** spectrum.
+- View live formula and FFT visualizations.
+- Play, pause, and stop audio.
+- Evaluate expressions with a restricted AST-based evaluator.
+- Use Low Power Mode on older or resource-limited computers.
+- Run on modern Windows, older Windows releases, Linux, and macOS (see compatibility notes).
+
+## ⚡ Quick start
+
+### Download a ready-to-run build
+
+Get the latest package from [GitHub Releases](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest).
+
+| Platform | Package |
+|---|---|
+| Windows 10/11 (modern) | [Download](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-modern.zip) |
+| Windows 7 / 8.1 / older Windows 10 | [Download legacy build](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-legacy.zip) |
+| Linux x64 | [Download](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-linux-x64.zip) |
+| macOS Apple Silicon | [Download](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-arm64.zip) |
+
+macOS Intel packages are not currently available.
+
+### Run from source
+
+```bash
+git clone https://github.com/whiteby4e/MATH-EQUALIZER.git
+cd MATH-EQUALIZER
+python -m venv .venv
+```
+
+Activate the environment, then install and run:
+
+```bash
+# Windows
+.venv\Scripts\activate
+
+# Linux / macOS
+source .venv/bin/activate
+
+python -m pip install -r requirements.txt
+python main.py
+```
+
+For the modern build, use Python 3.10 or newer.
+
+## 🧮 Formula guide
+
+The variable `t` represents elapsed time in seconds.
+
+Try this example:
 
 ```text
 1 + 0.5*sin(2*pi*2*t)
 ```
 
-This creates a gain value that changes over time.
-
-Available constants and functions include:
+It creates a gain value that oscillates over time. Available constants and functions include:
 
 ```text
-pi
-e
-sin
-cos
-tan
-exp
-sqrt
-abs
-log
-log10
-floor
-ceil
+pi, e
+sin, cos, tan
+exp, sqrt, abs
+log, log10
+floor, ceil
 ```
 
-The final gain is limited by the audio processor to keep the output in a safe numerical range.
+The processor limits the final gain to a safe numerical range. Very complex or rapidly changing expressions may still increase CPU usage.
 
-## Frequency bands
+## 🎚️ Frequency bands
 
-| Band | Frequency range |
-|---|---|
+| Band | Range |
+|---|---:|
 | BASS | Below 250 Hz |
 | MID | 250 Hz – 4 kHz |
-| TREBLE | 4 kHz and above |
+| TREBLE | Above 4 kHz |
 | FULL | Entire spectrum |
 
-## Windows compatibility
+## 🪶 Low Power Mode
 
-MATH-EQUALIZER now has two Windows GUI paths:
+Low Power Mode reduces visualization and processing overhead:
 
-| Windows | Build | GUI stack |
-|---|---|---|
-| Windows 10/11 | Modern | PySide6 / Qt 6 |
-| Windows 10 old builds, including 15063 (1703) | Legacy | PySide2 / Qt 5 |
-| Windows 8.1 | Legacy | PySide2 / Qt 5 |
-| Windows 7 SP1 | Legacy | PySide2 / Qt 5 |
+- Disables live graphs.
+- Avoids loading Matplotlib.
+- Uses a smaller FFT size and a larger processing hop.
+- Updates the lightweight interface less often.
 
-The legacy path is separate from the modern dependencies because current Qt 6/PySide6 releases do not target Windows 7/8.1 and require newer Windows 10 builds.
-
-For legacy Windows, use Python 3.8.x and the dedicated launcher.
-
-### Legacy Windows
-
-Run: `math_equalizer/run_windows_legacy.bat`
-
-For older or weaker legacy PCs, use: `math_equalizer/run_windows_legacy_low_power.bat`
-
-Manual commands:
-
-`python main.py --legacy-windows`
-
-`python main.py --legacy-windows --low-power`
-
-The legacy and modern launchers use separate virtual environments (`.venv-legacy` and `.venv`) so their Qt versions do not conflict.
-
-## Platform launch links
-
-Use the launcher that matches your operating system:
-
-### Windows
-
-| Windows version | Launcher |
-|---|---|
-| Windows 7 SP1 | [Windows 7 launcher](math_equalizer/run_windows_7.bat) |
-| Windows 8.1 | [Windows 8.1 launcher](math_equalizer/run_windows_8_1.bat) |
-| Windows 10 old builds, including 15063 (1703) | [Windows 10 Legacy launcher](math_equalizer/run_windows_10_legacy.bat) |
-| Windows 10/11 current builds | [Windows 10/11 launcher](math_equalizer/run_windows_10_11.bat) |
-
-Legacy Windows uses Python 3.8.x and the PySide2/Qt 5 compatibility path.
-
-### Linux
-
-- [Linux normal launcher](math_equalizer/run_linux.sh)
-- [Linux Low Power launcher](math_equalizer/run_linux_low_power.sh)
-
-### macOS
-
-- [macOS normal launcher](math_equalizer/run_macos.sh)
-- [macOS Low Power launcher](math_equalizer/run_macos_low_power.sh)
-
-The Linux and macOS launchers use the modern Python/PySide6 dependency set. Run shell launchers with "bash" if the executable bit is not preserved by your download method.
-
-## Downloads
-
-Prebuilt packages are published as GitHub Releases:
-
-| Platform | Download |
-|---|---|
-| Windows 10/11 (modern) | [Windows Modern](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-modern.zip) |
-| Windows 10 old builds / 8.1 / 7 SP1 | [Windows Legacy](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-windows-legacy.zip) |
-| Linux x64 | [Linux x64](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-linux-x64.zip) |
-| macOS Intel | **Download not available yet** |
-| macOS Apple Silicon | [macOS Apple Silicon](https://github.com/whiteby4e/MATH-EQUALIZER/releases/latest/download/math-equalizer-macos-arm64.zip) |
-
-These links point to the latest release. Packages are generated automatically when a version tag such as `v0.1.0` is pushed.
-
-## Requirements
-
-- Python 3.10 or newer for the modern build
-- Python 3.8.x for the legacy Windows build
-- Windows, Linux, or macOS
-- A working audio output device
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/whiteby4e/MATH-EQUALIZER.git
-cd MATH-EQUALIZER
-```
-
-Create a virtual environment:
-
-```bash
-python -m venv .venv
-```
-
-Activate it on Windows:
-
-```bat
-.venv\\Scripts\\activate
-```
-
-Install the dependencies:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-Run:
-
-```bash
-python main.py
-```
-
-## Windows
-
-For normal mode, run:
-
-```text
-math_equalizer/run_windows.bat
-```
-
-The script creates the virtual environment if needed, installs dependencies, and starts the application.
-
-## Low Power Mode
-
-Older computers can use **Low Power Mode** to reduce CPU and RAM usage.
-
-Low Power Mode:
-
-- disables the live graphs
-- avoids loading Matplotlib
-- uses a smaller FFT size
-- uses a larger processing hop
-- updates the lightweight interface less often
-- keeps the main audio-processing functionality
-
-### Windows
-
-Run:
-
-```text
-math_equalizer/run_windows_low_power.bat
-```
-
-Or start it manually:
+Run it with:
 
 ```bash
 python main.py --low-power
 ```
 
-The low-power launcher uses `requirements-lite.txt`, which does not install Matplotlib.
+On Windows, the included `run_windows_low_power.bat` launcher can also be used. Low Power Mode helps older computers, but cannot guarantee uninterrupted real-time playback on every system.
 
-### When to use it
+## 🪟 Compatibility
 
-Use Low Power Mode if the normal version causes:
+| Environment | GUI stack | Python |
+|---|---|---|
+| Windows 10/11 (modern builds) | PySide6 / Qt 6 | 3.10+ |
+| Windows 10 build 15063 (1703), Windows 8.1, Windows 7 SP1 | PySide2 / Qt 5 | 3.8.x |
+| Linux / macOS | PySide6 / Qt 6 | 3.10+ |
 
-- high CPU usage
-- audio dropouts
-- slow interface response
-- excessive memory usage
+The legacy Windows path is kept separate from modern dependencies because current Qt 6 releases do not support Windows 7/8.1 and require newer Windows 10 builds.
 
-The normal mode is intended for computers that can comfortably handle real-time FFT visualization.
+## 🎹 MathRoll Easter egg
 
-## Project structure
+Enter `rickastly` in the formula field, choose **Apply Formula**, then press **Play** to discover a short original retro-pop synth sequence generated locally with mathematical oscillators. It does not require an audio file or an internet connection.
+
+This is an unofficial fan-made tribute and is not affiliated with or endorsed by Rick Astley.
+
+## 🧱 Project structure
 
 ```text
 MATH-EQUALIZER/
 ├── main.py
 ├── requirements.txt
 ├── requirements-lite.txt
-├── LICENSE
-├── README.md
+├── requirements-legacy-windows.txt
+├── tests/
 └── math_equalizer/
-    ├── __init__.py
     ├── app.py
     ├── audio.py
-    ├── easter_egg.py
     ├── formula.py
     ├── visualizer.py
-    ├── run_windows.bat
-    └── run_windows_low_power.bat
+    └── run_*.bat / run_*.sh
 ```
 
-## Notes
+## 🧪 Tests
 
-- This project changes audio using mathematical gain functions; it is an experimental audio-processing project rather than a conventional graphic equalizer.
-- Formula values are evaluated over time and applied to the selected frequency band.
-- Very large or rapidly changing formulas can still require more CPU.
-- Low Power Mode removes visualization overhead but does not guarantee real-time playback on every old computer.
-- The project currently focuses on local audio-file playback, with MathRoll as a built-in procedural-synth exception.
+Run the formula evaluator tests with:
 
-## License
+```bash
+python -m unittest discover -s tests
+```
 
-MIT License. See [LICENSE](LICENSE).
+## 📦 Releases
+
+Versioned packages are built through the repository's GitHub Actions release workflow when a version tag (for example, `v0.1.0`) is pushed. See [all releases](https://github.com/whiteby4e/MATH-EQUALIZER/releases).
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE).
